@@ -1,12 +1,22 @@
 let timerEl = document.querySelector(".timer");
-let startButton = document.getElementById("startButton");
-let hSButton = document.getElementById("highScoreButton");
 let hSList = document.getElementById("highScoreList");
-let iButton = document.getElementById("infoButton");
 let iBox = document.getElementById("infoBox");
+let rBox = document.getElementById("resultsBox")
+let eMess = document.getElementById("endMessage")
 
 let highScoreNum = 10;
 let highScores = [];
+
+let preTime = 3;
+let answerTime = 1.5;
+let gameTime = 100;
+let counter;
+let aCounter;
+
+let qLeft = 10;
+let qIndex = 0;
+let skipLeft = 3;
+let qWrong = 0;
 
 function init() {
     let storedHighScores = JSON.parse(localStorage.getItem("highScoreList"))
@@ -128,25 +138,121 @@ let questions = [
     },
 ]
 
-//timer 5 s windup, 100s count
-//wrong answer = -10, skip = -5
+function preCountdown () {
+    counter = setInterval(timer, 1000)
+    function timer () {
+        timerEl.textContent = preTime;
+        // timerEl.style.fontsize = "36px";
+        preTime --;
+
+        if (preTime < 0){
+            gameTimer(gameTime)
+        }
+    }
+}
+
+function answerCountdown () {
+    aCounter = setInterval(timer, 1000)
+    function timer () {
+        timerEl.textContent = answerTime;
+        answerTime --;
+    }
+}
+
+function gameTimer () {
+    preTime = 3;
+    counter = setInterval(timer, 1000);
+    function timer () {
+        timerEl.textContent = gameTime
+        // timerEl.style.fontsize = "16px"
+        gameTime --;
+
+        if (gameTime < 0){
+            clearInterval(counter);
+            timerEl.textContent = "Times Up!";
+            gameOver();
+        }
+    }
+}
+
+function nextQuestion (qNum) {
+    let index = Math.floor(Math.random() * qNum) - 1
+    qIndex = index
+    let qText = document.querySelector('#qText')
+
+    let qTag = '<span>'+ questions[index].numb + ". " + questions[index].question +'</span>';
+    let oTag = '<div class="option"><span>'+ questions[index].options[0] +'</span></div>'
+    + '<div class = "option"><span>'+ questions[index].options[1] +'</span></div>'
+    + '<div class = "option"><span>'+ questions[index].options[2] +'</span></div>'
+    + '<div class = "option"><span>'+ questions[index].options[3] +'</span></div>';
+    qText.innerHTML = qTag;
+    option_list.innerHTML = oTag;
+    
+    let option = option_list.querySelectorAll(".option");
+
+    // set onclick attribute to all available options
+    for(i=0; i < option.length; i++){
+        option[i].setAttribute("onclick", "selectedOption(this)");
+    }
+
+    qLeft --;
+}
+
+function selectedOption (option) {
+    let uAns = option.textContent;
+    let cAns = questions[qIndex].a;
+
+    if (uAns == cAns) {
+        option.setAttribute("style", "background-color: green")
+        answerCountdown();
+        gameTime += 1.5;
+
+        if (answerTime < 0){
+            nextQuestion(qLeft)
+        }
+
+    } else {
+        option.setAttribute("style", "background-color: red")
+        answerCountdown();
+        gameTime -= 8.5;
+        qWrong -= 1;
+
+        if (qWrong == 3){
+            gameTime = 0;
+            gameOver()
+
+        } else if (answerTime < 0){
+            nextQuestion(qLeft)
+        }
+    }
+}
 
 function gameOver () {
-    checkScores (account.score);
+    clearInterval(counter);
+    clearInterval(aCounter);
+    rBox.setAttribute("style", "display: fixed")
+    if (time <= 0) {
+        eMess.textContent = "Sorry, you got a 0! Try again next time"
+    } else {    
+        checkScores (gameTime);
+    }
 }
 
 function checkScores (score) {
-    if (highScores[highScoreNum] !== null){
-        lowestScore = 0
+    let lowestScore = 0;
+
+    if (highScores[highScoreNum - 1] !== null){
+        lowestScore = highScores[9].score.val();
     } else {
-        lowestScore = 0
+        lowestScore = 0;
     }
 
     if (score > lowestScore) {
+        eMess.textContent = "You attained a high score!"
         saveHighScore (score);
         showHighScores();
     } else {
-        alert("Sorry, you did not attain a high score")
+        eMess.textContent = "Sorry, you did not attain a high score"
     }
 }
 
@@ -174,7 +280,23 @@ function showHighScores () {
     .join('');   
 }
 
-hSButton.addEventListener("click", function() {
+document.getElementById("startButton").addEventListener("click", function(){
+    iBox.setAttribute("style", "display: none")
+    preCountdown();
+
+    if (preTime < 0){
+        nextQuestion();
+    }    
+})
+
+document.getElementById("skipButton").addEventListener("click", function(){
+    if (skipLeft > 0){
+        gameTime -= 5;
+        nextQuestion()
+    }
+})
+
+document.getElementById("highScoreButton").addEventListener("click", function() {
     showHighScores();
     var state = hSList.getAttribute("data-state")
     if (state === "hidden"){
@@ -190,7 +312,7 @@ hSButton.addEventListener("click", function() {
       }
 })
 
-iButton.addEventListener("click", function (){
+document.getElementById("infoButton").addEventListener("click", function () {
     let state = iBox.getAttribute("data-state");
 
     if (state === "hidden"){
@@ -206,9 +328,17 @@ iButton.addEventListener("click", function (){
       }
     })
 
-document.getElementById("quit").addEventListener("click", function(){
+document.getElementById("quitButton").addEventListener("click", function() {
         window.location.reload();
     })
 
+document.getElementById("restartButton").addEventListener("click", function() {
+    iBox.setAttribute("style", "display: none")
+    preCountdown();
+
+    if (preTime < 0){
+        nextQuestion();
+    }    
+})
 
 init()

@@ -20,8 +20,8 @@
     <aside id = "infoBox" data-state = "hidden" style = "display: none">
         <li class = "info"> You have 100 seconds to answer all 10 questions </li>
         <li class = "info"> Each incorrect answer will decrease the remaining time by 10 seconds </li>
-        <li class = "info">Getting three questions wrong will result in a game over</li>
-        <li class = "info">Skipping a question will reduce the remaining time by 5 seconds</li>
+        <li class = "info"> Getting three questions wrong will result in a game over</li>
+        <li class = "info"> Skipping a question will reduce the remaining time by 5 seconds. You may skip 3 questions</li>
         <li class = "info"> Your score will be displayed at the end and you have the chance to save it if you get a high score</li>
          
     </aside>
@@ -33,7 +33,7 @@
         </header>
 
         <section>
-            <div class = "questionText"></div>
+            <div id = "qText"></div>
 
             <div class = "optionList"></div>
         </section>
@@ -47,8 +47,8 @@
 
     <div id = "resultsBox" style="display: none">
         <div id = "endMessage"></div>
-        <button id = "quit">Exit Quiz</button>
-        <button id = "restart">Try Again?</button>
+        <button id = "quitButton">Exit Quiz</button>
+        <button id = "restartButton">Try Again?</button>
     </div>
     <script src="./assets/js/script.js"></script>
 </body>
