@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game</title>
+    <link rel="stylesheet" href="./assets/css/reset.css" />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+
+</head>
+<body>
+    <h1>Welcome to the Coding Quiz!</h1>
+    <button id = "startButton"> Start</button>
+    <button id = "infoButton"> Information</button>
+    <button id = "highScoreButton">View High Scores</button>
+
+    <ol id = "highScoreList" data-state = "hidden"></ol>
+
+    <aside id = "infoBox" data-state = "hidden" style = "display: none">
+        <li class = "info"> You have 100 seconds to answer all 10 questions </li>
+        <li class = "info"> Each incorrect answer will decrease the remaining time by 10 seconds </li>
+        <li class = "info">Getting three questions wrong will result in a game over</li>
+        <li class = "info">Skipping a question will reduce the remaining time by 5 seconds</li>
+        <li class = "info"> Your score will be displayed at the end and you have the chance to save it if you get a high score</li>
+         
+    </aside>
+
+    <main class = "quizBox" style="display: none">
+        <header>
+            <h2>Quiz Time!</h2>
+            <div class = timer></div>
+        </header>
+
+        <section>
+            <div class = "questionText"></div>
+
+            <div class = "optionList"></div>
+        </section>
+
+        <footer>
+            <div class = "questionTotal"></div>
+            <button class = "skipButton">Skip Question</button>
+        </footer>
+
+    </main>
+
+    <div id = "resultsBox" style="display: none">
+        <div id = "endMessage"></div>
+        <button id = "quit">Exit Quiz</button>
+        <button id = "restart">Try Again?</button>
+    </div>
+    <script src="./assets/js/script.js"></script>
+</body>
+</html>
