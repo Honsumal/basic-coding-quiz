@@ -1,19 +1,21 @@
 let timerEl = document.querySelector(".timer");
 let hSList = document.getElementById("highScoreList");
 let iBox = document.getElementById("infoBox");
-let rBox = document.getElementById("resultsBox")
-let eMess = document.getElementById("endMessage")
+let qBox = document.getElementById("quizBox");
+let rBox = document.getElementById("resultsBox");
+let eMess = document.getElementById("endMessage");
+let oList = document.getElementById('optionList');
 
 let highScoreNum = 10;
 let highScores = [];
 
 let preTime = 3;
-let answerTime = 1.5;
-let gameTime = 100;
+let gameTime = 50;
+let pCounter;
 let counter;
-let aCounter;
 
 let qLeft = 10;
+let qNumber = 1;
 let qIndex = 0;
 let skipLeft = 3;
 let qWrong = 0;
@@ -21,15 +23,28 @@ let qWrong = 0;
 function init() {
     let storedHighScores = JSON.parse(localStorage.getItem("highScoreList"))
 
-    if (storedHighScores !== null) {
+    if (storedHighScores !== undefined) {
         highScores = storedHighScores;
     } 
+
+    preTime = 3;
+    gameTime = 50;
+
+    qLeft = 10;
+    qNumber = 1;
+    qIndex = 0;
+    skipLeft = 3;
+    qWrong = 0;
+
+    questions = structuredClone(questionRepo)
+
+    document.getElementById('skipButton').setAttribute('style', 'display: none')
   }
-let questions = [
+let questionRepo = [
     {
-        index: 1,
-        q: "What is HTML",
-        a: "HyperText Markup Language",
+        num: 1,
+        q: "What is HTML?",
+        a: "Hyper Text Markup Language",
         op: [
             "Hyperbolic Time Morphing Loghouse",
             "Hyper Text Markup Language",
@@ -38,8 +53,8 @@ let questions = [
         ]
     },
     {
-        index: 2,
-        q: "What is CSS",
+        num: 2,
+        q: "What is CSS?",
         a: "Cascading Style Sheets",
         op: [
             "Cascading Style Sheets",
@@ -49,8 +64,8 @@ let questions = [
         ]
     },
     {
-        index: 3,
-        q: "Which of the following is a HTML tag",
+        num: 3,
+        q: "Which of the following is a HTML tag?",
         a: "/td",
         op: [
             "/ti",
@@ -60,8 +75,8 @@ let questions = [
         ]
     },
     {
-        index: 4,
-        q: "Which of the following is NOT a valid DOM Traversal method",
+        num: 4,
+        q: "Which of the following is NOT a valid DOM Traversal method?",
         a: "document.getElementsById()",
         op: [
             "document.querySelector()",
@@ -71,8 +86,8 @@ let questions = [
         ]
     },
     {
-        index: 5,
-        q: "Which element should be the parent",
+        num: 5,
+        q: "Which element should be the parent?",
         a: "body",
         op: [
             "main",
@@ -82,8 +97,8 @@ let questions = [
         ]
     },
     {
-        index: 6,
-        q: "What happens when you use Math.floor() on a non-number",
+        num: 6,
+        q: "What happens when you use Math.floor() on a non-number?",
         a: "returns a NaN",
         op: [
             "returns an error",
@@ -93,19 +108,19 @@ let questions = [
         ]
     },
     {
-        index: 7,
-        q: "Which of the following is NOT a valid css combinator",
+        num: 7,
+        q: "Which of the following is NOT a valid css combinator?",
         a: "boo < far",
         op: [
             "foo > bar",
             "boo bar",
-            "boo < far ",
+            "boo < far",
             "foo ~ far"
         ]
     },
     {
-        index: 8,
-        q: "Which of the following is a valid git command",
+        num: 8,
+        q: "Which of the following is a valid git command?",
         a: "git rm",
         op: [
             "git commit -A",
@@ -115,8 +130,8 @@ let questions = [
         ]
     },
     {
-        index: 9,
-        q: "which of the following is NOT a valid value for justify-content",
+        num: 9,
+        q: "Which of the following is NOT a valid value for justify-content?",
         a: "space-about",
         op: [
             "space-around",
@@ -126,8 +141,8 @@ let questions = [
         ]
     },
     {
-        index: 10,
-        q: "Which of the following is a valid value for align-items",
+        num: 10,
+        q: "Which of the following is a valid value for align-items?",
         a: "stretch",
         op: [
             "stretch",
@@ -139,99 +154,100 @@ let questions = [
 ]
 
 function preCountdown () {
-    counter = setInterval(timer, 1000)
+    pCounter = setInterval(timer, 1000)
+    timerEl.textContent = 'Ready?'
     function timer () {
         timerEl.textContent = preTime;
-        // timerEl.style.fontsize = "36px";
         preTime --;
 
-        if (preTime < 0){
-            gameTimer(gameTime)
+        if (preTime < 0 && gameTime == 50){
+            gameTimer(gameTime);
+            nextQuestion(qLeft);
         }
     }
 }
 
-function answerCountdown () {
-    aCounter = setInterval(timer, 1000)
-    function timer () {
-        timerEl.textContent = answerTime;
-        answerTime --;
-    }
-}
 
 function gameTimer () {
     preTime = 3;
     counter = setInterval(timer, 1000);
     function timer () {
         timerEl.textContent = gameTime
-        // timerEl.style.fontsize = "16px"
-        gameTime --;
+        gameTime -= 1;
 
-        if (gameTime < 0){
+        if (gameTime === 0){
             clearInterval(counter);
-            timerEl.textContent = "Times Up!";
+
             gameOver();
         }
     }
 }
 
 function nextQuestion (qNum) {
-    let index = Math.floor(Math.random() * qNum) - 1
+    document.getElementById('skipButton').setAttribute('style', 'display: shown')
+    let index = Math.floor(Math.random() * qNum)
     qIndex = index
-    let qText = document.querySelector('#qText')
+    let qText = document.getElementById('qText')
 
-    let qTag = '<span>'+ questions[index].numb + ". " + questions[index].question +'</span>';
-    let oTag = '<div class="option"><span>'+ questions[index].options[0] +'</span></div>'
-    + '<div class = "option"><span>'+ questions[index].options[1] +'</span></div>'
-    + '<div class = "option"><span>'+ questions[index].options[2] +'</span></div>'
-    + '<div class = "option"><span>'+ questions[index].options[3] +'</span></div>';
+    let qTag = '<span>'+ qNumber + ". " + questions[index].q +'</span>';
+    let oTag = 
+    '<div class = "option"><span>' + questions[index].op[0] + '</span></div>' + 
+    '<div class = "option"><span>' + questions[index].op[1] + '</span></div>' + 
+    '<div class = "option"><span>' + questions[index].op[2] + '</span></div>' + 
+    '<div class = "option"><span>' + questions[index].op[3] + '</span></div>';
+
     qText.innerHTML = qTag;
-    option_list.innerHTML = oTag;
+    oList.innerHTML = oTag;
     
-    let option = option_list.querySelectorAll(".option");
+    var option = oList.querySelectorAll(".option");
 
     // set onclick attribute to all available options
-    for(i=0; i < option.length; i++){
+    for(i = 0; i < option.length; i ++){
         option[i].setAttribute("onclick", "selectedOption(this)");
     }
-
-    qLeft --;
 }
 
 function selectedOption (option) {
     let uAns = option.textContent;
     let cAns = questions[qIndex].a;
 
-    if (uAns == cAns) {
-        option.setAttribute("style", "background-color: green")
-        answerCountdown();
-        gameTime += 1.5;
+    questions.splice(qIndex, 1)
 
-        if (answerTime < 0){
+    qLeft --;
+    qNumber ++;
+
+    if (uAns == cAns) {
+        console.log ("correct answer")
+        if (qLeft > 0){
             nextQuestion(qLeft)
+        } else {
+            gameOver ();
         }
 
     } else {
-        option.setAttribute("style", "background-color: red")
-        answerCountdown();
-        gameTime -= 8.5;
-        qWrong -= 1;
+        console.log ("incorrect answer")
+        gameTime -= 5;
+        qWrong ++;
 
         if (qWrong == 3){
             gameTime = 0;
             gameOver()
 
-        } else if (answerTime < 0){
+        } else if (qLeft > 0){
             nextQuestion(qLeft)
+
+        } else {
+            gameOver()
         }
     }
 }
 
 function gameOver () {
     clearInterval(counter);
-    clearInterval(aCounter);
+
+    qBox.setAttribute("style", "display: none")
     rBox.setAttribute("style", "display: fixed")
-    if (time <= 0) {
+    if (gameTime <= 0) {
         eMess.textContent = "Sorry, you got a 0! Try again next time"
     } else {    
         checkScores (gameTime);
@@ -241,8 +257,8 @@ function gameOver () {
 function checkScores (score) {
     let lowestScore = 0;
 
-    if (highScores[highScoreNum - 1] !== null){
-        lowestScore = highScores[9].score.val();
+    if (highScores[highScoreNum - 1] !== undefined){
+        lowestScore = highScores[9].score;
     } else {
         lowestScore = 0;
     }
@@ -281,18 +297,33 @@ function showHighScores () {
 }
 
 document.getElementById("startButton").addEventListener("click", function(){
+    init()
+    clearInterval(counter)
+    clearInterval(pCounter)
+    rBox.setAttribute('style', 'display: none')
+    
     iBox.setAttribute("style", "display: none")
+    hSList.setAttribute("style", "display: none")
+    qBox.setAttribute("style", "display: shown")
+    qText.innerHTML = ''
+    oList.innerHTML = ''
+    
     preCountdown();
 
     if (preTime < 0){
-        nextQuestion();
+        nextQuestion(qLeft);
     }    
 })
 
 document.getElementById("skipButton").addEventListener("click", function(){
     if (skipLeft > 0){
-        gameTime -= 5;
-        nextQuestion()
+        gameTime -= 3;
+        questions.splice(qIndex, 1)
+        skipLeft -= 1;
+        qLeft -= 1;
+        qNumber ++;
+        
+        nextQuestion(qLeft);
     }
 })
 
@@ -303,6 +334,9 @@ document.getElementById("highScoreButton").addEventListener("click", function() 
         hSList.dataset.state = "shown";
         hSList.setAttribute("style", "display: shown");
         hSList.setAttribute("data-state", "shown");
+        iBox.dataset.state = "hidden";
+        iBox.setAttribute("style", "display: none");
+        iBox.setAttribute("data-state", "hidden");
       }
   
       if (state === "shown"){
@@ -319,6 +353,9 @@ document.getElementById("infoButton").addEventListener("click", function () {
         iBox.dataset.state = "shown";
         iBox.setAttribute("style", "display: shown");
         iBox.setAttribute("data-state", "shown");
+        hSList.dataset.state = "hidden";
+        hSList.setAttribute("style", "display: none");
+        hSList.setAttribute("data-state", "hidden");
       }
   
       if (state === "shown"){
@@ -326,19 +363,14 @@ document.getElementById("infoButton").addEventListener("click", function () {
         iBox.setAttribute("style", "display: none");
         iBox.setAttribute("data-state", "hidden");
       }
-    })
-
-document.getElementById("quitButton").addEventListener("click", function() {
-        window.location.reload();
-    })
+})
 
 document.getElementById("restartButton").addEventListener("click", function() {
-    iBox.setAttribute("style", "display: none")
-    preCountdown();
-
-    if (preTime < 0){
-        nextQuestion();
-    }    
+    init()
+    clearInterval(counter)
+    clearInterval(pCounter)
+    rBox.setAttribute('style', 'display: none')
+    
 })
 
 init()
