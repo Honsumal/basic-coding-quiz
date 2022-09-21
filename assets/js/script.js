@@ -20,6 +20,7 @@ let qIndex = 0;
 let skipLeft = 3;
 let qWrong = 0;
 
+//Initialize function, used for both startup and resetting the quiz
 function init() {
     let storedHighScores = JSON.parse(localStorage.getItem("highScoreList"))
 
@@ -40,6 +41,8 @@ function init() {
 
     document.getElementById('skipButton').setAttribute('style', 'display: none')
   }
+
+//Question repository
 let questionRepo = [
     {
         num: 1,
@@ -153,6 +156,7 @@ let questionRepo = [
     },
 ]
 
+//Short Countdown before the start of the quiz
 function preCountdown () {
     pCounter = setInterval(timer, 1000)
     timerEl.textContent = 'Ready?'
@@ -160,33 +164,35 @@ function preCountdown () {
         timerEl.textContent = preTime;
         preTime --;
 
-        if (preTime < 0 && gameTime == 50){
+        if (preTime < 0 ){ 
             gameTimer(gameTime);
             nextQuestion(qLeft);
         }
     }
 }
 
-
+//Timer for the quiz
 function gameTimer () {
+    clearInterval(pCounter) //Prevents preCountdown from re-executing
     preTime = 3;
     counter = setInterval(timer, 1000);
     function timer () {
         timerEl.textContent = gameTime
-        gameTime -= 1;
+        gameTime --;
 
         if (gameTime === 0){
             clearInterval(counter);
 
-            gameOver();
+            gameOver(); //Game over condition: Timer runs out
         }
     }
 }
 
+//Function for extracting a random question from the repo and displaying it
 function nextQuestion (qNum) {
     document.getElementById('skipButton').setAttribute('style', 'display: shown')
     let index = Math.floor(Math.random() * qNum)
-    qIndex = index
+    qIndex = index //For selectedOption() below to be able to retrieve the correct answer
     let qText = document.getElementById('qText')
 
     let qTag = '<span>'+ qNumber + ". " + questions[index].q +'</span>';
@@ -201,17 +207,18 @@ function nextQuestion (qNum) {
     
     var option = oList.querySelectorAll(".option");
 
-    // set onclick attribute to all available options
+    // Makes each option clickable and proceeds to selectedOption() below
     for(i = 0; i < option.length; i ++){
         option[i].setAttribute("onclick", "selectedOption(this)");
     }
 }
 
+//Evaluates if the selected option is correct
 function selectedOption (option) {
     let uAns = option.textContent;
     let cAns = questions[qIndex].a;
 
-    questions.splice(qIndex, 1)
+    questions.splice(qIndex, 1) //removes the selected question from the question list to avoid doubling up
 
     qLeft --;
     qNumber ++;
@@ -221,7 +228,7 @@ function selectedOption (option) {
         if (qLeft > 0){
             nextQuestion(qLeft)
         } else {
-            gameOver ();
+            gameOver (); //Game over condition: all questions answered
         }
 
     } else {
@@ -231,17 +238,18 @@ function selectedOption (option) {
 
         if (qWrong == 3){
             gameTime = 0;
-            gameOver()
+            gameOver() //Game over condition: 3 wrongs accrued
 
         } else if (qLeft > 0){
             nextQuestion(qLeft)
 
         } else {
-            gameOver()
+            gameOver() //Game over condition: all questions answered
         }
     }
 }
 
+//Function for determining results of the quiz
 function gameOver () {
     clearInterval(counter);
 
@@ -251,13 +259,14 @@ function gameOver () {
     if (gameTime <= 0) {
         eMess.textContent = "Sorry, you got a 0. Try again next time!"
     } else {    
-        checkScores (gameTime);
+        checkScores (gameTime); //Score is determined by time remaining on the clock
     }
 }
 
 function checkScores (score) {
     let lowestScore = 0;
 
+    //Checks if there is a tenth high score. If not, proceeds as though the tenth high score is 0
     if (highScores[highScoreNum - 1] != null || highScores[highScoreNum - 1] != undefined){
         lowestScore = highScores[9].score;
     } else {
@@ -273,6 +282,7 @@ function checkScores (score) {
     }
 }
 
+//Saves high scores using inputted initials and score, also sorts list for display
 function saveHighScore (score) {
     let playerInitials = prompt("You got a high score! Enter two initials: ");
     while (playerInitials.length != 2) {
@@ -290,21 +300,20 @@ function saveHighScore (score) {
 
 }
 
+//Displays high scores
 function showHighScores () {
     let highScoreList = document.getElementById("highScoreList");
-
-    if (typeof(highScores) == "string") {
-        highScoreList.innerHTML = highScores
-
-    }   else {     
-        highScoreList.innerHTML = highScores
-        .map((score) => `<li>${score.playerInitials} - ${score.score}`)
-        .join('');  
-    } 
+    
+    highScoreList.innerHTML = highScores
+    .map((score) => `<li>${score.playerInitials} - ${score.score}`)
+    .join('');  
 }
 
+//The following provide functionality to the buttons used
 document.getElementById("startButton").addEventListener("click", function(){
     init()
+
+    //Redundancy for in case player presses "start" to restart the game
     clearInterval(counter)
     clearInterval(pCounter)
     rBox.setAttribute('style', 'display: none')
@@ -321,7 +330,6 @@ document.getElementById("startButton").addEventListener("click", function(){
         nextQuestion(qLeft);
     }    
 })
-
 document.getElementById("skipButton").addEventListener("click", function(){
     if (skipLeft > 0){
         gameTime -= 3;
@@ -333,7 +341,6 @@ document.getElementById("skipButton").addEventListener("click", function(){
         nextQuestion(qLeft);
     }
 })
-
 document.getElementById("highScoreButton").addEventListener("click", function() {
     showHighScores();
     var state = hSList.getAttribute("data-state")
@@ -352,7 +359,6 @@ document.getElementById("highScoreButton").addEventListener("click", function() 
         hSList.setAttribute("data-state", "hidden");
       }
 })
-
 document.getElementById("infoButton").addEventListener("click", function () {
     let state = iBox.getAttribute("data-state");
 
@@ -371,7 +377,6 @@ document.getElementById("infoButton").addEventListener("click", function () {
         iBox.setAttribute("data-state", "hidden");
       }
 })
-
 document.getElementById("restartButton").addEventListener("click", function() {
     init()
     clearInterval(counter)
