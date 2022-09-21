@@ -18,7 +18,7 @@ This is function picks a random question from the "questions" array and displays
 ### selectedOption()
 This function evaluates whether or not the user selected the correct answer. It compares the user's answer with the correct answer before executing logic from there. The "questions" array is also spliced within this function so that the user doesn't answer the same question multiple times. The quiz ends if either the user answers 3 questions wrong, or the "questions" array is exhausted.
 
-### gameOver(), checkScores, saveHighScore
+### gameOver(), checkScores(), saveHighScore()
 This function triggers when either a) gameTime runs out, b) the user got 3 questions wrong, or c) when the "questions" array has been exhausted. If the user completed the quiz, the application checks whether or not they achieved a high score, and prompts the user to enter their initials if they have to record their score.
 
 ## Installation
