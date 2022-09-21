@@ -29,14 +29,9 @@ h1{
 
 h2 {
     font-size: 36px;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
-
-}
-
-nav {
-    text-align: center;
+    display: block;
+    text-align: left;
+    margin-left: 25.5%;
 }
 
 #infoBox,
@@ -47,6 +42,7 @@ nav {
     padding: 10px;
 }
 
+nav,
 #infoBox,
 #resultsBox{
     display: block;
@@ -57,15 +53,37 @@ nav {
 
 #quizBox {
     display: block;
-    margin-left: 30%;
+    margin-left: 25%;
 }
 
 #highScoreList{
     text-align: center;
 }
 
+#optionList{
+    margin-top: 10px;
+}
 
+#optionList .option{
+    padding: 5px;
+    margin: 10px;
+    width: fit-content;
+    border-radius: 10px;
+    background-color: var(--ultra);
+}
 
+#optionList .option:hover{
+    box-shadow: inset 0px 0px 8px var(--givry), 0 0 15px var(--givry);
+    cursor: pointer;
+}
+
+.timer {
+    display: block;
+    text-align: center;
+    margin-right: 33%;
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
 
 button {
     background-color: var(--swan);
@@ -73,7 +91,17 @@ button {
     padding: 10px;
 }
 
-#skipButton,
-#restartButton {
-    margin-top: 100px;
+button:hover {
+    cursor:pointer;
 }
+
+#skipButton {
+    margin-top: 50px;
+    margin-left: 25.5%
+}
+
+#restartButton {
+    margin-top: 50px;
+    margin-left: 30%
+}
+

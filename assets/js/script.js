@@ -23,9 +23,9 @@ let qWrong = 0;
 function init() {
     let storedHighScores = JSON.parse(localStorage.getItem("highScoreList"))
 
-    if (storedHighScores !== undefined) {
+    if (storedHighScores !== null) {
         highScores = storedHighScores;
-    } 
+    }
 
     preTime = 3;
     gameTime = 50;
@@ -247,8 +247,9 @@ function gameOver () {
 
     qBox.setAttribute("style", "display: none")
     rBox.setAttribute("style", "display: fixed")
+    
     if (gameTime <= 0) {
-        eMess.textContent = "Sorry, you got a 0! Try again next time"
+        eMess.textContent = "Sorry, you got a 0. Try again next time!"
     } else {    
         checkScores (gameTime);
     }
@@ -257,7 +258,7 @@ function gameOver () {
 function checkScores (score) {
     let lowestScore = 0;
 
-    if (highScores[highScoreNum - 1] !== undefined){
+    if (highScores[highScoreNum - 1] != null || highScores[highScoreNum - 1] != undefined){
         lowestScore = highScores[9].score;
     } else {
         lowestScore = 0;
@@ -268,7 +269,7 @@ function checkScores (score) {
         saveHighScore (score);
         showHighScores();
     } else {
-        eMess.textContent = "Sorry, you did not attain a high score"
+        eMess.textContent = "Sorry, you did not attain a high score."
     }
 }
 
@@ -291,9 +292,15 @@ function saveHighScore (score) {
 
 function showHighScores () {
     let highScoreList = document.getElementById("highScoreList");
-    highScoreList.innerHTML = highScores
-    .map((score) => `<li>${score.playerInitials} - ${score.score}`)
-    .join('');   
+
+    if (typeof(highScores) == "string") {
+        highScoreList.innerHTML = highScores
+
+    }   else {     
+        highScoreList.innerHTML = highScores
+        .map((score) => `<li>${score.playerInitials} - ${score.score}`)
+        .join('');  
+    } 
 }
 
 document.getElementById("startButton").addEventListener("click", function(){
